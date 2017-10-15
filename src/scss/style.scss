@@ -1,0 +1,157 @@
+$background: #333;
+
+body {
+  background: $background;
+  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+  overflow: hidden;
+}
+
+#app {
+  bottom: 0;
+  height: 100%;
+  left: 0;
+  min-height: 600px;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+#main-panel {
+  background: white;
+  height: 100%;
+  left: 0;
+  outline: none;
+  position: absolute;
+  right: 320px;
+  
+  .canvas {
+    margin-bottom: -4px;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+#control-panel {
+  background: #404040;
+  border: solid 1px grey;
+  bottom: 30px;
+  height: 100px;
+  position: absolute;
+  width: 100%;
+
+  input[type="text"] {
+    border: solid 2px gray;
+    font-family: inherit;
+    font-size: 24px;
+    outline: none;
+    width: 100%;
+  }
+}
+
+#side-panel {
+  height: 100%;
+  min-height: 600px;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 320px;
+  
+  p {
+    margin: 0;
+  }
+
+  .information-panel {
+    background: $background;
+    border: solid 1px grey;
+    color: white;
+    margin: 0;
+    padding: 4px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  
+    .input-with-btn {
+      display: inline-block;
+      height: 21px;
+      position: relative;
+      width: 97%;
+
+      button {
+        bottom: 0;
+        height: 100%;
+        position: absolute;
+        right: 0;
+      }
+    }
+    
+    .txt-paths {
+      box-sizing: border-box;
+      height: 100%;
+      width: 100%
+    }
+  }
+
+  .cube-panel {
+    border: solid 1px grey;
+    bottom: 30px;
+    height: 320px;
+    position: absolute;
+    margin: 0;
+    width: 100%;
+  } 
+}
+
+.links {
+  line {
+    stroke: red;
+    stroke-dasharray: 6, 3;
+    stroke-opacity: 0.6;
+    stroke-width: 4px;
+  }
+
+  line.focused {
+    stroke: #00f;
+    stroke-opacity: 0.6;
+    stroke-width: 4px;
+  }
+
+  text {
+    font-size: 14px;
+    font-weight: bold;
+  }
+}
+
+.nodes {
+  circle {
+    stroke: #fff;
+    stroke-width: 1.5px;
+  }
+
+  circle.root {
+    stroke: #f00;
+    stroke-dasharray: 12, 6.84;
+    stroke-width: 5px;
+  }
+
+  circle.focused {
+    stroke: #000;
+    stroke-width: 5px;
+  }
+}
+
+#footer-panel {
+  background: $background;
+  border: solid 1px grey;
+  bottom: 0px;
+  color: white;
+  line-height: 30px;
+  height: 30px;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.icon {
+  fill: #000;
+}
