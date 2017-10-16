@@ -22,7 +22,12 @@ export default {
         :y2="link.target.y"
         v-bind:class="{focused : link.focused}"
       />
-    </g>`,
+      <circle v-if="link.isActive" class="atcive-location"
+        r="4"
+        :cx="activeX"
+        :cy="activeY"
+      />,
+  </g>`,
 
   computed: {
     id: function (): string {
@@ -42,6 +47,26 @@ export default {
 
     textY: function (): number {
       return this.link.source.y + 0.6 * (this.link.target.y - this.link.source.y);
+    },
+
+    activeX: function(): number {
+      const source = this.link.source;
+      const target = this.link.target;
+      if (this.link.progress < 0) {
+        return target.x + (source.x - target.x) * (this.link.progress / 100 * -1);
+      } else {
+        return source.x + (target.x - source.x) * (this.link.progress / 100);
+      }
+    },
+
+    activeY: function(): number {
+      const source = this.link.source;
+      const target = this.link.target;
+      if (this.link.progress < 0) {
+        return target.y + (source.y - target.y) * (this.link.progress / 100 * -1);
+      } else {
+        return source.y + (target.y - source.y) * (this.link.progress / 100);
+      }
     },
 
     markerUrl: function(): string {

@@ -4,6 +4,8 @@ import CubeUtils from './CubeUtils'
 export default class GraphLink {
   private _id: string;
   private _path: string;
+  isActive: boolean = false;
+  progress: number = 0;
 
   constructor(path: string, public source: GraphNode, public target: GraphNode) {
     this.path = path;
