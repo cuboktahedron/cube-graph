@@ -6,6 +6,7 @@ import { GraphLinkElement } from './GraphLinkElement'
 import CubeUtils from '../models/CubeUtils'
 import GraphNode from '../models/GraphNode'
 import GraphLink from '../models/GraphLink'
+import RotationContext from '../models/RotationContext'
 
 export interface MainCanvas extends Vue {
   height: number,
@@ -13,6 +14,7 @@ export interface MainCanvas extends Vue {
   nodes: GraphNode[],
   links: GraphLink[],
   linkIds: string[],
+  rotationContext: RotationContext,
   selectedNode: GraphNode,
   zoom: any,
 
@@ -22,7 +24,7 @@ export interface MainCanvas extends Vue {
   dragended(d: any): void,
   onKeyDown(event: KeyboardEvent): void,
   rotatePaths(paths: string): void,
-  rotate(node: GraphNode, mark: string): GraphNode,
+  rotate(node: GraphNode, mark: string): boolean,
   forwardNode(selectedNode: GraphNode, selectedLink: GraphLink),
   backwardNode(selectedNode: GraphNode, selectedLink: GraphLink),
   selectLeftLink(selectedNode: GraphNode, selectedLink: GraphLink),
@@ -40,6 +42,7 @@ export default {
       nodes: [],
       links: [],
       linkIds: [],
+      rotationContext: new RotationContext(),
       zoom: null,
     }
   },
@@ -160,9 +163,9 @@ export default {
 
       if (event.which in keycodes) {
         let path = keycodes[event.which] + ((event.shiftKey) ? "'" : "");
-        selectedNode = this.rotate(selectedNode, path);
-        this.$store.dispatch('selectNode', selectedNode);
-        this.update();
+        if (this.rotate(selectedNode, path)) {
+          this.update();
+        }
       }
 
       const selectedLink = this.$store.state.selectedLink;
@@ -188,10 +191,9 @@ export default {
     },
 
     forwardNode: function (selectedNode: GraphNode, selectedLink: GraphLink) {
-      if (selectedLink.source === selectedNode) {
+      if (selectedLink.source === selectedNode && !this.rotationContext.isActive) {
         let path = this.$store.state.selectedLink.path
-        selectedNode = this.rotate(selectedNode, path);
-        this.$store.dispatch('selectNode', selectedNode);
+        this.rotate(selectedNode, path);
       } else {
         let nextLink = selectedNode.links.concat()
           .sort(GraphLink.orderBySource(selectedNode))[0];
@@ -200,10 +202,9 @@ export default {
     },
 
     backwardNode: function (selectedNode: GraphNode, selectedLink: GraphLink) {
-      if (selectedLink.target === selectedNode) {
+      if (selectedLink.target === selectedNode && !this.rotationContext.isActive) {
         let path = this.$store.state.selectedLink.path
-        selectedNode = this.rotate(selectedNode, CubeUtils.normalize(path + "'"));
-        this.$store.dispatch('selectNode', selectedNode);
+        this.rotate(selectedNode, CubeUtils.normalize(path + "'"));
       } else {
         let nextLink = selectedNode.links.concat()
           .sort(GraphLink.orderByTarget(selectedNode))[0];
@@ -252,16 +253,20 @@ export default {
 
       paths.forEach((path) => {
         const selectedNode: GraphNode = this.$store.state.selectedNode;
-        let nextNode = this.rotate(selectedNode, path);
-        this.$store.dispatch('selectNode', nextNode);
+        if (this.rotate(selectedNode, path)) {
+          this.update();
+        }
       });
-
-      this.update();
     },
 
-    rotate: function (node: GraphNode, mark: string): GraphNode {
+    rotate: function (node: GraphNode, mark: string): boolean {
+      if (this.rotationContext.isActive) {
+        this.rotationContext.addPath(mark);
+        return;
+      }
+
       let newGraphNode = node.copy();
-      let link: GraphLink;
+      let nextLink: GraphLink;
       let source: GraphNode;
       let target: GraphNode
       let nextNode: GraphNode;
@@ -274,36 +279,42 @@ export default {
         this.nodes.push(newGraphNode);
         source = node;
         target = newGraphNode;
-        link = new GraphLink(mark, source, target);
-        this.links.push(link);
+        nextLink = new GraphLink(mark, source, target);
+        this.links.push(nextLink);
         nextNode = newGraphNode;
       } else {
         nextNode = sameGraphNode[0];
         let linkId = GraphLink.createLinkId(node, sameGraphNode[0]);
-        if (this.linkIds[linkId]) {
-          return nextNode;
+        nextLink = this.linkIds[linkId];
+        if (!!nextLink) {
+          const positive = (nextLink.path === mark);
+          this.rotationContext.setCurrentLink(nextLink, positive);
+          return false;
         }
 
         if (node.distance < sameGraphNode[0].distance) {
           source = node;
           target = sameGraphNode[0]
-          link = new GraphLink(mark, source, target);
+          nextLink = new GraphLink(mark, source, target);
         } else {
           source = sameGraphNode[0]
           target = node;
-          link = new GraphLink(mark + "'", source, target);
+          nextLink = new GraphLink(mark + "'", source, target);
         }
 
-        this.links.push(link);
+        this.links.push(nextLink);
 
         target.updateLinkDirections();
       }
 
-      this.linkIds[link.id] = true;
-      return nextNode;
+      this.linkIds[nextLink.id] = nextLink;
+      const positive = (nextLink.path === mark);
+      this.rotationContext.setCurrentLink(nextLink, positive);
+
+      return true;
     },
 
-    centering: function(node: GraphNode) {
+    centering: function (node: GraphNode) {
       const svg = d3.select("#cube-graph-canvas");
       const svgElem: any = svg.node();
       const transform = d3.zoomTransform(svgElem);
@@ -311,20 +322,33 @@ export default {
       svg.transition()
         .duration(200)
         .call(this.zoom.transform, () => {
-        return d3.zoomIdentity
-          .translate(-node.x * k, -node.y * k)
-          .translate(svgElem.clientWidth / 2, svgElem.clientHeight / 2)
-          .scale(k);
+          return d3.zoomIdentity
+            .translate(-node.x * k, -node.y * k)
+            .translate(svgElem.clientWidth / 2, svgElem.clientHeight / 2)
+            .scale(k);
         })
     },
 
-    selectRoot: function() {
+    selectRoot: function () {
       const rootNode = this.nodes.filter(node => node.distance === 0)[0];
       this.$store.dispatch('selectNode', rootNode);
     },
 
     ticked: function () {
+      const next = this.rotationContext.next();
+      if (next == null) {
+        return;
+      }
 
+      if (!!next.node) {
+        this.$store.dispatch('selectNode', next.node);
+
+        if (!!next.path) {
+          if (this.rotate(next.node, next.path)) {
+            this.update();
+          }
+        }
+      }
     },
   },
 

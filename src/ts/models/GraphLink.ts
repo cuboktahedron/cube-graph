@@ -4,7 +4,6 @@ import CubeUtils from './CubeUtils'
 export default class GraphLink {
   private _id: string;
   private _path: string;
-  isActive: boolean = false;
   progress: number = 0;
 
   constructor(path: string, public source: GraphNode, public target: GraphNode) {
@@ -41,6 +40,17 @@ export default class GraphLink {
     this._focused = false;
   }
 
+  private _isActive: boolean = false;
+
+  get isActive(): boolean {
+    return this._isActive;
+  }
+
+  set isActive(newValue: boolean) {
+    this._isActive = newValue;
+    this.progress = 0;
+  }
+  
   static createLinkId(source: GraphNode, target: GraphNode) {
     if (source.id < target.id) {
       return source.id + "-" + target.id;
