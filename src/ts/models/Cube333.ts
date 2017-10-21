@@ -2,6 +2,7 @@ import Cube from './Cube'
 import CubeColor from './CubeColor'
 import CubeUtils from './CubeUtils'
 import GraphNode from './GraphNode'
+import GraphLink from './GraphLink'
 import * as THREE from 'three'
 
 export default class Cube333 {
@@ -24,7 +25,17 @@ export default class Cube333 {
     }
   }
 
-  action() {
+  action(activeLink: GraphLink) {
+    if (activeLink == null) {
+      return;
+    }
+
+    const path = activeLink.path;
+    const progressRatio = activeLink.progress / 100;
+    Cube333.targetCubes[path].forEach((no) => {
+      this.cubes[no].rotate(Cube333.axes[path], Cube333.directions[path],
+        (Math.PI / 2) * progressRatio)
+    });
   }
 
   fixate(path: string) {
@@ -125,24 +136,24 @@ export default class Cube333 {
 
   static axes = (() => {
     const axes = {
-      "U" : "-Y",
-      "D" : "Y",
-      "R" : "-X",
-      "L" : "X",
-      "F" : "-Z",
-      "B" : "Z",
-      "E" : "Y",
-      "M" : "X",
-      "S" : "-Z",
+      "U": "-Y",
+      "D": "Y",
+      "R": "-X",
+      "L": "X",
+      "F": "-Z",
+      "B": "Z",
+      "E": "Y",
+      "M": "X",
+      "S": "-Z",
       "Uw": "-Y",
       "Dw": "Y",
       "Rw": "-X",
       "Lw": "X",
       "Fw": "-Z",
       "Bw": "Z",
-      "x" : "-X",
-      "y" : "-Y",
-      "z" : "-Z",
+      "x": "-X",
+      "y": "-Y",
+      "z": "-Z",
     }
 
     for (let p in axes) {
@@ -158,24 +169,24 @@ export default class Cube333 {
 
   static directions = (() => {
     const directions = {
-      "U"  : new THREE.Vector3(0, -1, 0),
-      "D"  : new THREE.Vector3(0, 1, 0),
-      "R"  : new THREE.Vector3(1, 0, 0),
-      "L"  : new THREE.Vector3(-1, 0, 0),
-      "F"  : new THREE.Vector3(0, 0, 1),
-      "B"  : new THREE.Vector3(0, 0, -1),
-      "E"  : new THREE.Vector3(0, 1, 0),
-      "M"  : new THREE.Vector3(-1, 0, 0),
-      "S"  : new THREE.Vector3(0, 0, 1),
-      "Uw" : new THREE.Vector3(0, -1, 0),
-      "Dw" : new THREE.Vector3(0, 1, 0),
-      "Rw" : new THREE.Vector3(1, 0, 0),
-      "Lw" : new THREE.Vector3(-1, 0, 0),
-      "Fw" : new THREE.Vector3(0, 0, 1),
-      "Bw" : new THREE.Vector3(0, 0, -1),
-      "x"  : new THREE.Vector3(1, 0, 0),
-      "y"  : new THREE.Vector3(0, -1, 0),
-      "z"  : new THREE.Vector3(0, 0, 1),
+      "U": new THREE.Vector3(0, -1, 0),
+      "D": new THREE.Vector3(0, 1, 0),
+      "R": new THREE.Vector3(1, 0, 0),
+      "L": new THREE.Vector3(-1, 0, 0),
+      "F": new THREE.Vector3(0, 0, 1),
+      "B": new THREE.Vector3(0, 0, -1),
+      "E": new THREE.Vector3(0, 1, 0),
+      "M": new THREE.Vector3(-1, 0, 0),
+      "S": new THREE.Vector3(0, 0, 1),
+      "Uw": new THREE.Vector3(0, -1, 0),
+      "Dw": new THREE.Vector3(0, 1, 0),
+      "Rw": new THREE.Vector3(1, 0, 0),
+      "Lw": new THREE.Vector3(-1, 0, 0),
+      "Fw": new THREE.Vector3(0, 0, 1),
+      "Bw": new THREE.Vector3(0, 0, -1),
+      "x": new THREE.Vector3(1, 0, 0),
+      "y": new THREE.Vector3(0, -1, 0),
+      "z": new THREE.Vector3(0, 0, 1),
     };
 
     for (let p in directions) {
@@ -204,9 +215,9 @@ export default class Cube333 {
     targetCubes['Lw'] = targetCubes['L'].concat(targetCubes['M']);
     targetCubes['Fw'] = targetCubes['F'].concat(targetCubes['S']);
     targetCubes['Bw'] = targetCubes['B'].concat(targetCubes['S']);
-    targetCubes['x']  = targetCubes['L'].concat(targetCubes['M'], targetCubes['R']);
-    targetCubes['y']  = targetCubes['U'].concat(targetCubes['E'], targetCubes['D']);
-    targetCubes['z']  = targetCubes['F'].concat(targetCubes['S'], targetCubes['B']);
+    targetCubes['x'] = targetCubes['L'].concat(targetCubes['M'], targetCubes['R']);
+    targetCubes['y'] = targetCubes['U'].concat(targetCubes['E'], targetCubes['D']);
+    targetCubes['z'] = targetCubes['F'].concat(targetCubes['S'], targetCubes['B']);
 
     for (let p in targetCubes) {
       targetCubes[p + "'"] = targetCubes[p].concat();

@@ -77,7 +77,8 @@ export default {
     },
 
     action: function () {
-      this.cubes.action();
+      const activeLink = this.$store.state.activeLink;
+      this.cubes.action(activeLink);
     }
   },
 

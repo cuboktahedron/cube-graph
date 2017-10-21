@@ -4,8 +4,8 @@ import GraphLink from '../models/GraphLink'
 export default class RotationContext {
   _pendingPaths = [];
   _progress = 0
-  _positive;
-  _currentLink: GraphLink;
+  _positive = true;
+  _currentLink: GraphLink = null;
 
   addPath(path: string): void {
     this._pendingPaths.push(path);
@@ -18,19 +18,19 @@ export default class RotationContext {
     this._positive = positive;
   }
 
-  get isActive(): boolean {
-    return !!this._currentLink;
+  get currentLink(): GraphLink {
+    return this._currentLink;
   }
 
   next(): {
     node: GraphNode,
     path: string
   } {
-    if (!this.isActive) {
+    if (!this.currentLink) {
       return;
     }
 
-    this._progress = Math.min(this._progress + 5, 100);
+    this._progress = Math.min(this._progress + 10, 100);
     this._currentLink.progress = this.progress;
     if (this._progress === 100) {
       this._currentLink.isActive = false;

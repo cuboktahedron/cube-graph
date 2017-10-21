@@ -10,6 +10,7 @@ Vue.use(Vuex)
 
 interface Coordinates { x: number, y: number }
 interface State {
+  activeLink: GraphLink,
   bus: Vue,
   colors: ScaleOrdinal<string, string>,
   coordinates: Coordinates,
@@ -29,6 +30,7 @@ interface State {
 }
 
 const state: State = {
+  activeLink: null,
   bus: new Vue(),
   colors: d3.scaleOrdinal(d3.schemeCategory20),
   coordinates: { x: 0, y: 0 },
@@ -61,6 +63,16 @@ const mutations = {
       x: payload.x,
       y: payload.y
     };
+  },
+
+  selectActiveLink(state: State, activeLink: GraphLink) {
+    if (state.activeLink != null) {
+      state.activeLink.isActive = false;
+    }
+
+    console.log(activeLink);
+
+    state.activeLink = activeLink;
   },
 
   selectLink(state: State, selectedLink: GraphLink) {
@@ -103,6 +115,7 @@ const mutations = {
 const actions = {
   linkNum: ({ commit }, num: number) => commit('linkNum', num),
   nodeNum: ({ commit }, num: number) => commit('nodeNum', num),
+  selectActiveLink: ({ commit }, activeLink: GraphLink) => commit('selectActiveLink', activeLink),
   selectLink: ({ commit }, selectedLink: GraphLink) => commit('selectLink', selectedLink),
   selectNode: ({ commit, state }, selectedNode: GraphNode) => {
     let prevNode = state.selectedNode;

@@ -191,7 +191,7 @@ export default {
     },
 
     forwardNode: function (selectedNode: GraphNode, selectedLink: GraphLink) {
-      if (selectedLink.source === selectedNode && !this.rotationContext.isActive) {
+      if (selectedLink.source === selectedNode && !this.rotationContext.currentLink) {
         let path = this.$store.state.selectedLink.path
         this.rotate(selectedNode, path);
       } else {
@@ -202,7 +202,7 @@ export default {
     },
 
     backwardNode: function (selectedNode: GraphNode, selectedLink: GraphLink) {
-      if (selectedLink.target === selectedNode && !this.rotationContext.isActive) {
+      if (selectedLink.target === selectedNode && !this.rotationContext.currentLink) {
         let path = this.$store.state.selectedLink.path
         this.rotate(selectedNode, CubeUtils.normalize(path + "'"));
       } else {
@@ -260,7 +260,7 @@ export default {
     },
 
     rotate: function (node: GraphNode, mark: string): boolean {
-      if (this.rotationContext.isActive) {
+      if (!!this.rotationContext.currentLink) {
         this.rotationContext.addPath(mark);
         return;
       }
@@ -359,6 +359,10 @@ export default {
 
     links: function () {
       this.$store.dispatch("linkNum", this.links.length);
+    },
+
+    "rotationContext.currentLink": function() {
+        this.$store.dispatch("selectActiveLink", this.rotationContext.currentLink);
     }
   },
 } as ComponentOptions<MainCanvas>

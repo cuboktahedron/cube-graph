@@ -7,7 +7,6 @@ export default class Cube {
   _dir: THREE.Quaternion = new THREE.Quaternion();
   quaternion: THREE.Quaternion = new THREE.Quaternion();
   colors: CubeColor[];
-  radius: number;
   static Size = 10;
   static Gap = 1;
   static Unit = Cube.Size + Cube.Gap;
@@ -30,20 +29,15 @@ export default class Cube {
 
   set pos(newValue: THREE.Vector3) {
     this._pos = newValue;
-    const distance = Math.abs(this.pos.x) + Math.abs(this.pos.y) + Math.abs(this.pos.z);
-    if (distance <= 1) {
-      this.radius = 0;
-    } else if (distance === 2) {
-      this.radius = 1;
-    } else {
-      this.radius = Math.sqrt(2);
-    }
-
     this._position = this.pos.clone().multiplyScalar(Cube.Unit);
   }
 
   get position(): THREE.Vector3 {
     return this._position;
+  }
+
+  calculateRadius(pos1: number, pos2: number) {
+    return Math.sqrt(pos1 * pos1 + pos2 * pos2);
   }
 
   rotate(axisWithSign: string, dir: THREE.Vector3, radian: number) {
@@ -55,19 +49,22 @@ export default class Cube {
     const axis = axisWithSign.charAt(axisWithSign.length - 1);
     const addRagian = sign * radian;
     if (axis === 'X') {
+      const radius = this.calculateRadius(this._pos.y, this._pos.z);
       const baseRad = Math.atan2(this._pos.y, this._pos.z);
       v.x *= Cube.Unit;
-      v.y = (Math.sin(baseRad + addRagian) * this.radius * Cube.Unit);
-      v.z = (Math.cos(baseRad + addRagian) * this.radius * Cube.Unit);
+      v.y = (Math.sin(baseRad + addRagian) * radius * Cube.Unit);
+      v.z = (Math.cos(baseRad + addRagian) * radius * Cube.Unit);
     } else if (axis === 'Y') {
+      const radius = this.calculateRadius(this._pos.x, this._pos.z);
       const baseRad = Math.atan2(this._pos.x, this._pos.z);
-      v.x = (Math.sin(baseRad + addRagian) * this.radius * Cube.Unit);
+      v.x = (Math.sin(baseRad + addRagian) * radius * Cube.Unit);
       v.y *= Cube.Unit;
-      v.z = (Math.cos(baseRad + addRagian) * this.radius * Cube.Unit);
+      v.z = (Math.cos(baseRad + addRagian) * radius * Cube.Unit);
     } else if (axis === 'Z') {
+      const radius = this.calculateRadius(this._pos.x, this._pos.y);
       const baseRad = Math.atan2(this._pos.x, this._pos.y);
-      v.x = (Math.sin(baseRad + addRagian) * this.radius * Cube.Unit);
-      v.y = (Math.cos(baseRad + addRagian) * this.radius * Cube.Unit);
+      v.x = (Math.sin(baseRad + addRagian) * radius * Cube.Unit);
+      v.y = (Math.cos(baseRad + addRagian) * radius * Cube.Unit);
       v.z *= Cube.Unit;
     } else {
       throw new Error(`Invalid axis(${axis})`);
