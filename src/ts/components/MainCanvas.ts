@@ -30,7 +30,7 @@ export interface MainCanvas extends Vue {
   selectLeftLink(selectedNode: GraphNode, selectedLink: GraphLink),
   selectRightLink(selectedNode: GraphNode, selectedLink: GraphLink),
   selectRoot(),
-  ticked(): void,
+  mainLoop(): void,
   update(): void,
   onZoom(): void,
 }
@@ -81,7 +81,6 @@ export default {
 
     simulation
       .nodes(this.nodes)
-      .on("tick", this.ticked);
 
     simulation.force("link")['links'](this.links);
     this.$store.dispatch('setSimulation', simulation);
@@ -101,6 +100,8 @@ export default {
     this.selectRoot();
     const selectedNode: GraphNode = this.$store.state.selectedNode;
     this.centering(selectedNode);
+
+    setInterval(this.mainLoop, 1000 / 60);
   },
 
   computed: {
@@ -334,7 +335,7 @@ export default {
       this.$store.dispatch('selectNode', rootNode);
     },
 
-    ticked: function () {
+    mainLoop: function () {
       const next = this.rotationContext.next();
       if (next == null) {
         return;
