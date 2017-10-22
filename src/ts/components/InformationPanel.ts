@@ -2,11 +2,23 @@ import Vue, { ComponentOptions } from 'vue'
 import * as d3 from 'd3';
 
 interface InformationPanel extends Vue {
+  fps: number,
+  prevTick: number,
+
+  action(): void,
 }
 
 export default {
+  data: function () {
+    return {
+      fps: 0,
+      prevTick: new Date().getTime(),
+    }
+  },
+
   template: `
     <div>
+      <p>Fps: {{fps}}
       <p>Node: {{$store.state.nodeNum}} Link: {{$store.state.linkNum}}
       <p>{{coordinates}}</p>
       <p>zoom: {{zoom}}</p>
@@ -27,7 +39,22 @@ export default {
       </template>
     </div>`,
 
+  created: function() {
+    this.$store.state.bus.$on('actionInformation', this.action);
+  },
+
   methods: {
+    action: function() {
+      const curTick = new Date().getTime();
+      if (!!this.prevTick) {
+        const diffTick = curTick - this.prevTick;
+        if (diffTick > 0) {
+          this.fps = Math.floor((1000 / (diffTick)) * 100) / 100;
+        }
+      }
+      this.prevTick = curTick;
+    },
+
     copyPathToRoot: function() {
       const txt = document.getElementById('txt-path-to-root') as HTMLInputElement;
       txt.select();
@@ -40,7 +67,7 @@ export default {
       txt.select();
       document.execCommand("copy");
       txt.blur();
-    }
+    },
   },
 
   computed: {

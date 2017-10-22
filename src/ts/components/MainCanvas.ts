@@ -336,6 +336,8 @@ export default {
     },
 
     mainLoop: function () {
+      this.$store.state.bus.$emit('actionInformation');
+
       const next = this.rotationContext.next();
       if (next == null) {
         return;
