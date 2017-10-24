@@ -73,7 +73,9 @@ export default {
     </svg>`,
 
   created: function () {
-    this.nodes.push(new GraphNode());
+    const rootNode = new GraphNode();
+    rootNode.isRoot = true;
+    this.nodes.push(rootNode);
 
     const simulation = d3.forceSimulation()
       .force("link", d3.forceLink().id(function (d: any) { return d.id; }).distance(80))

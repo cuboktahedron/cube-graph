@@ -26,7 +26,7 @@ export default {
       :cx="cube.x"
       :cy="cube.y"
       :fill="color"
-      v-bind:class="{focused : cube.focused, root: isRoot}"
+      v-bind:class="{focused : cube.focused, root: cube.isRoot}"
       @click.stop="onClick" 
     />`,
 
@@ -44,10 +44,6 @@ export default {
     color: function () {
       return this.$store.getters.colors(this.cube.distance);
     },
-
-    isRoot: function () {
-      return this.cube.distance === 0;
-    }
   },
 
   methods: {

@@ -14,6 +14,7 @@ export default class GraphNode {
   }
 
   private _id: number
+  isRoot:boolean = false;
 
   get id() {
     return this._id;
