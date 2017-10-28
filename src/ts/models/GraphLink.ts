@@ -50,7 +50,7 @@ export default class GraphLink {
     this._isActive = newValue;
     this.progress = 0;
   }
-  
+
   static createLinkId(source: GraphNode, target: GraphNode) {
     if (source.id < target.id) {
       return source.id + "-" + target.id;

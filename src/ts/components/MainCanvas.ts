@@ -22,6 +22,7 @@ export interface MainCanvas extends Vue {
   dragstarted(d: any): void,
   dragged(d: any): void,
   dragended(d: any): void,
+  deleteNode(node: GraphNode):boolean,
   onKeyDown(event: KeyboardEvent): void,
   rotatePaths(paths: string): void,
   rotate(node: GraphNode, mark: string): boolean,
@@ -191,6 +192,15 @@ export default {
       if (event.which === 72) { // H
         this.centering(selectedNode);
       }
+
+      if (event.which === 46) { // Del
+        const nextLinks = selectedNode.links.filter(link => link.target === selectedNode)
+        const nextNode = !!nextLinks[0] ? nextLinks[0].source : null;
+        if (this.deleteNode(selectedNode)) {
+          this.$store.dispatch('selectNode', nextNode);
+          this.update();
+        }
+      }
     },
 
     forwardNode: function (selectedNode: GraphNode, selectedLink: GraphLink) {
@@ -335,6 +345,28 @@ export default {
     selectRoot: function () {
       const rootNode = this.nodes.filter(node => node.distance === 0)[0];
       this.$store.dispatch('selectNode', rootNode);
+    },
+
+    deleteNode: function(node: GraphNode):boolean {
+      if (node.isRoot || !!this.rotationContext.currentLink) {
+        return false;
+      }
+
+      let removedLinks = node.links.concat();
+      node.remove();
+      const removedNodes = this.nodes.filter(node => node.distance === -1);
+      removedLinks = removedLinks.concat(
+        Array.prototype.concat.apply([], removedNodes.map(
+          node => node.links.filter(link => link.source === node))));
+      removedLinks = removedLinks.concat()
+
+      removedLinks.forEach(link => {
+        delete this.linkIds[link.id];
+      });
+
+      this.links = this.links.filter(link => removedLinks.indexOf(link) === -1);
+      this.nodes = this.nodes.filter(node => removedNodes.indexOf(node) === -1);
+      return true;
     },
 
     mainLoop: function () {
