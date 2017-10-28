@@ -13,7 +13,8 @@ export default class GraphNode {
     GraphNode.initializeRotationPattern();
   }
 
-  private _id: number
+  private _id: number;
+  private _name: string;
   isRoot:boolean = false;
 
   get id() {
@@ -24,6 +25,18 @@ export default class GraphNode {
     this._id = id;
   }
 
+  get name():string {
+    if (this._name == null) {
+      return this._id + "";
+    } else {
+      return this._name;
+    }
+  }
+
+  set name(newValue: string) {
+    this._name = newValue;
+  }
+  
   private _focused: boolean = false;
 
   get focused() {
@@ -70,6 +83,21 @@ export default class GraphNode {
     return newGraphNode;
   }
 
+  remove() {
+    let removeNodes: GraphNode[] = [this];
+    let removeLinks: GraphLink[] = this.links.concat();
+
+    const nextNodes = removeLinks.filter(link => link.source === this)
+      .map(link => link.target);
+
+    removeLinks.forEach(link => {
+      link.source.removeLink(link);
+      link.target.removeLink(link);
+    });
+    nextNodes.forEach(node => node.updateLinkDirections());
+    this.updateDistance();
+  }
+
   rotate(mark): void {
     var movePatterns = GraphNode.RotationTable[mark];
     var movePattern;
@@ -94,15 +122,15 @@ export default class GraphNode {
   }
 
   updateDistance(): void {
-    var that = this;
-    var distances = this.links.filter(function (link) {
-      return link.source !== that;
-    }).map(function (link) {
-      return link.source.distance;
-    });
-
-    if (distances.length === 0) {
+    if (this.isRoot) {
       this._distance = 0;
+      return;
+    }
+
+    var distances = this.links.filter(link => link.target === this)
+      .map(link => link.source.distance).filter(distance => distance >= 0);
+    if (distances.length === 0) {
+      this._distance = -1;
     } else {
       this._distance = Math.min.apply(null, distances) + 1;
     }
@@ -116,21 +144,37 @@ export default class GraphNode {
     this.links.push(link);
   }
 
-  updateLinkDirections(): void {
-    let targetedLinks = this.links.filter((link) => {
-      return link.target === this;
-    });
+  removeLink(link: GraphLink): void {
+    this.links.splice(this.links.indexOf(link), 1);
+  }
 
+  updateLinkDirections(): void {
     this.updateDistance();
-    targetedLinks.forEach((link: GraphLink) => {
-      let sourceOfTarget = link.source;
-      if (this.distance < sourceOfTarget.distance) {
-        link.source = this;
-        link.target = sourceOfTarget;
+
+    if (this.distance === -1) {
+      let sourcedLinks = this.links.filter((link) => {
+        return link.source === this && link.target.distance >= 0;
+      });
+      sourcedLinks.forEach(link => {
+        let target = link.target;
+        link.target = this;
+        link.source = target;
         link.path += "'";
-        link.target.updateLinkDirections();
-      }
-    });
+        target.updateLinkDirections();
+      });
+      this.updateDistance();
+    } else {
+      let targetedLinks = this.links.filter(link => link.target === this);
+      targetedLinks.forEach((link: GraphLink) => {
+        let sourceOfTarget = link.source;
+        if (this.distance < sourceOfTarget.distance) {
+          link.source = this;
+          link.target = sourceOfTarget;
+          link.path += "'";
+          link.target.updateLinkDirections();
+        }
+      });
+    }
   }
 
   pathsFromRoot(): string[] {
