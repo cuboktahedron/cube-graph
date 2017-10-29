@@ -13,9 +13,8 @@ export interface MainCanvas extends Vue {
   width: number,
   nodes: GraphNode[],
   links: GraphLink[],
-  linkIds: string[],
+  linkIds: string[],　 // TODO: change array to object
   rotationContext: RotationContext,
-  selectedNode: GraphNode,
   zoom: any,
 
   centering(node: GraphNode): void,
@@ -32,6 +31,7 @@ export interface MainCanvas extends Vue {
   selectRightLink(selectedNode: GraphNode, selectedLink: GraphLink),
   selectRoot(),
   mainLoop(): void,
+  openNew(): void,
   update(): void,
   onZoom(): void,
 }
@@ -74,37 +74,28 @@ export default {
     </svg>`,
 
   created: function () {
-    const rootNode = new GraphNode();
-    rootNode.isRoot = true;
-    this.nodes.push(rootNode);
-
     const simulation = d3.forceSimulation()
       .force("link", d3.forceLink().id(function (d: any) { return d.id; }).distance(80))
       .force("charge", d3.forceManyBody());
-
-    simulation
-      .nodes(this.nodes)
 
     simulation.force("link")['links'](this.links);
     this.$store.dispatch('setSimulation', simulation);
 
     this.$store.state.bus.$on('rotatePaths', this.rotatePaths);
-
-    this.zoom = d3.zoom();
+    this.$store.state.bus.$on('cmdNew', this.openNew);
   },
 
   mounted: function () {
     document.body.addEventListener('keydown', this.onKeyDown);
 
+    this.zoom = d3.zoom();
     d3.select("svg").call(this.zoom
       .scaleExtent([0.1, 5])
       .on("zoom", this.onZoom));
 
-    this.selectRoot();
-    const selectedNode: GraphNode = this.$store.state.selectedNode;
-    this.centering(selectedNode);
-
     setInterval(this.mainLoop, 1000 / 60);
+
+    this.openNew();
   },
 
   computed: {
@@ -387,6 +378,21 @@ export default {
         }
       }
     },
+
+    openNew: function() {
+      const rootNode = new GraphNode();
+      rootNode.isRoot = true;
+      this.nodes = [];
+      this.links = [];
+      this.linkIds = [];
+      this.rotationContext = new RotationContext();
+      this.nodes.push(rootNode);
+      this.update();
+
+      this.selectRoot();
+      const selectedNode: GraphNode = this.$store.state.selectedNode;
+      this.centering(selectedNode);
+    }
   },
 
   watch: {
