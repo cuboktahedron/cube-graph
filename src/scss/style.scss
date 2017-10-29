@@ -31,6 +31,39 @@ body {
   }
 }
 
+#menu-panel {
+  background: #404040;
+  border: solid 1px grey;
+  color: white;
+  outline: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+
+  .menu-group.horizontal {
+    display: inline-block;
+    margin: 2px;
+  }
+
+  .context-menu {
+    background: #404040;
+    border: solid 1px grey;
+    color: white;
+    position: absolute;
+    width: 200px;
+  }
+
+  > .menu-item + .menu-item {
+    border-left: solid 1px white;
+  }
+
+  .menu-group:hover,
+  .menu-item:hover {
+    background: white;
+    color: black;
+  }
+}
+
 #control-panel {
   background: #404040;
   border: solid 1px grey;

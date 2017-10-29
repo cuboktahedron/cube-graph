@@ -20,6 +20,10 @@ import CubePanel from './ts/components/CubePanel'
 import CubeView from './ts/components/CubeView'
 import ControlPanel from './ts/components/ControlPanel'
 import FooterPanel from './ts/components/FooterPanel'
+import ContextMenu from './ts/components/ContextMenu'
+import MenuItem from './ts/components/MenuItem'
+import MenuGroup from './ts/components/MenuGroup'
+import MenuPanel from './ts/components/MenuPanel'
 
 Vue.component('canvas-panel', MainPanel);
 Vue.component('main-canvas', MainCanvas);
@@ -30,6 +34,10 @@ Vue.component('information', InformationPanel);
 Vue.component('cube-panel', CubePanel);
 Vue.component('control-panel', ControlPanel);
 Vue.component('footer-panel', FooterPanel);
+Vue.component('context-menu', ContextMenu);
+Vue.component('menu-panel', MenuPanel);
+Vue.component('menu-group', MenuGroup);
+Vue.component('menu-item', MenuItem);
 Vue.component('cube', CubeView);
 Vue.component('icon', icon);
 
