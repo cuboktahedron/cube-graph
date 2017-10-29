@@ -17,13 +17,18 @@ export default {
     <div>
       <div class="menu-item"
         :title="description"
-        @click="onClick"
+        @click.stop="onClick"
       >{{title}}</div>
     </div>`,
 
   methods: {
     onClick() {
       this.$store.state.bus.$emit(this.command);
+
+      const activeElement = document.activeElement as HTMLElement
+      if (activeElement) {
+        activeElement.blur();
+      }
     },
   }
 } as ComponentOptions<MenuItem>
