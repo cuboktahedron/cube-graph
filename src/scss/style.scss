@@ -40,6 +40,11 @@ body {
   top: 0;
   width: 100%;
 
+  .menu-group,
+  .menu-item {
+    cursor: pointer;
+  }
+
   .menu-group.horizontal {
     display: inline-block;
     margin: 2px;
