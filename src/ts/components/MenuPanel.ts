@@ -20,6 +20,14 @@ export default {
             command: "cmdNew",
             title: "new",
             description: "Open new field.",
+          }, {
+            command: "cmdLoad",
+            title: "load",
+            description: "Load file.",
+          }, {
+            command: "cmdSave",
+            title: "save",
+            description: "Save file.",
           }]
         },
         {

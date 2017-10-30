@@ -23,6 +23,7 @@ export interface MainCanvas extends Vue {
   dragended(d: any): void,
   deleteNode(node: GraphNode):boolean,
   onKeyDown(event: KeyboardEvent): void,
+  loadData(data: any);
   rotatePaths(paths: string): void,
   rotate(node: GraphNode, mark: string): boolean,
   forwardNode(selectedNode: GraphNode, selectedLink: GraphLink),
@@ -32,6 +33,7 @@ export interface MainCanvas extends Vue {
   selectRoot(),
   mainLoop(): void,
   openNew(): void,
+  save(outData: any): void
   update(): void,
   onZoom(): void,
 }
@@ -81,7 +83,9 @@ export default {
     simulation.force("link")['links'](this.links);
     this.$store.dispatch('setSimulation', simulation);
 
+    this.$store.state.bus.$on('loadData', this.loadData);
     this.$store.state.bus.$on('rotatePaths', this.rotatePaths);
+    this.$store.state.bus.$on('saveCanvas', this.save);
     this.$store.state.bus.$on('cmdNew', this.openNew);
   },
 
@@ -392,6 +396,90 @@ export default {
       this.selectRoot();
       const selectedNode: GraphNode = this.$store.state.selectedNode;
       this.centering(selectedNode);
+    },
+
+    loadData(data: any): void {
+      const newNodes: GraphNode[] = [];
+      const newLinks: GraphLink[] = [];
+      const newLinkIds: string[] = [];
+      const oldRootNode = data.nodes.filter(node => node.isRoot)[0];
+      const oldIdToNewNode = {};
+      const newRootNode = new GraphNode(data.rootStatus);
+      newRootNode.isRoot = true;
+      oldIdToNewNode[oldRootNode.id] = newRootNode;
+      newNodes.push(newRootNode);
+      
+      const oldIdToNode = (() => {
+        const oldIdToNode = {};
+        data.nodes.forEach(node => {
+          oldIdToNode[node.id] = node;
+        });
+        return oldIdToNode;
+      })();
+
+      let oldNodeIdStack = [oldRootNode.id];
+
+      while (oldNodeIdStack.length > 0) {
+        const wrkOldNodeStack = oldNodeIdStack.concat();
+        oldNodeIdStack = [];
+        wrkOldNodeStack.forEach(oldNodeId => {
+          const oldNode = oldIdToNode[oldNodeId];
+          const nextOldLinks = data.links.filter(oldLink => oldLink.source === oldNodeId);
+
+          nextOldLinks.forEach(oldLink => {
+            const newSourceNode = oldIdToNewNode[oldLink.source];
+            let newTargetNode = oldIdToNewNode[oldLink.target];
+            if (!newTargetNode) {
+              const oldTargetNode = oldIdToNode[oldLink.target];
+              oldNodeIdStack.push(oldLink.target);
+              newTargetNode = newSourceNode.copy();
+              newTargetNode.rotate(oldLink.path);
+              newTargetNode.x = oldTargetNode.x;
+              newTargetNode.y = oldTargetNode.y;
+              newTargetNode.fx = oldTargetNode.fx;
+              newTargetNode.fy = oldTargetNode.fy;
+              oldIdToNewNode[oldLink.target] = newTargetNode;
+              newNodes.push(newTargetNode);
+            }
+
+            const newLink = new GraphLink(oldLink.path, newSourceNode, newTargetNode);
+            newLinks.push(newLink);
+            newLinkIds[newLink.id] = newLink;
+          });
+        })
+      }
+
+      this.nodes = newNodes;
+      this.links = newLinks;
+      this.linkIds = newLinkIds;
+      this.rotationContext = new RotationContext();
+      
+      this.update();
+
+      this.selectRoot();
+      const selectedNode: GraphNode = this.$store.state.selectedNode;
+      this.centering(selectedNode);
+    },
+
+    save(outData: any): void {
+      outData.rootStatus = this.nodes.filter(node => node.isRoot)[0].status;
+      outData.nodes = this.nodes.map(node => {
+        return {
+          id: node.id,
+          isRoot: node.isRoot,
+          x: node.x,
+          y: node.y,
+          fx: node.fx,
+          fy: node.fy,
+        };
+      });
+      outData.links = this.links.map(link => {
+        return {
+          source: link.source.id,
+          target: link.target.id,
+          path: link.path,
+        };
+      });
     }
   },
 
