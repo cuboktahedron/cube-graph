@@ -43,6 +43,12 @@ export default {
     this.$store.state.bus.$on('cmdNew', this.openNew);
     this.$store.state.bus.$on('cmdSave', this.save);
     this.$store.state.bus.$on('cmdReset', this.reset);
+
+    window.addEventListener('beforeunload', function(e: BeforeUnloadEvent) {
+      const dialogText = 'Are you sure you want to leave?';
+      e.returnValue = dialogText;
+      return dialogText;
+    });
   },
 
   methods: {
