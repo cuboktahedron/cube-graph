@@ -1,17 +1,29 @@
 import Vue, { ComponentOptions } from 'vue'
 import CubeUtils from '../models/CubeUtils'
+import GraphNode from '../models/GraphNode'
 
 interface ControllPanel extends Vue {
   paths: string,
+  resetData: any,
 
   load(): void,
+  openNew(): void,
   save(): void,
+  reset(): void,
 }
 
 export default {
   data: function () {
+    const root = new GraphNode();
+    root.isRoot = true;
+
     return {
-      paths: ""
+      paths: "",
+      resetData: {
+        links: [],
+        nodes: [ root ],
+        rootStatus: root.status,
+      }        
     };
   },
 
@@ -28,7 +40,9 @@ export default {
 
   created: function() {
     this.$store.state.bus.$on('cmdLoad', this.load);
+    this.$store.state.bus.$on('cmdNew', this.openNew);
     this.$store.state.bus.$on('cmdSave', this.save);
+    this.$store.state.bus.$on('cmdReset', this.reset);
   },
 
   methods: {
@@ -51,6 +65,7 @@ export default {
         try {
           const data = JSON.parse(e.target.result);
           this.$store.state.bus.$emit('loadData', data);
+          this.resetData = data;
         } catch (ex) {
           alert('This is not valid file.');
         }
@@ -61,6 +76,20 @@ export default {
 
     load: function() {
       document.getElementById('file-load').click();
+    },
+
+    openNew: function() {
+      const root = new GraphNode();
+      root.isRoot = true;
+  
+      const newData = {
+        links: [],
+        nodes: [ root ],
+        rootStatus: root.status,
+      };
+
+      this.resetData = newData;
+      this.reset();
     },
 
     save: function() {
@@ -77,5 +106,9 @@ export default {
       anchor.download=name;
       document.getElementById('file-save').click();
     },
+
+    reset: function() {
+      this.$store.state.bus.$emit('loadData', this.resetData);
+    }
   }
 } as ComponentOptions<ControllPanel>

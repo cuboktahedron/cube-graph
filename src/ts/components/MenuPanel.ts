@@ -34,7 +34,7 @@ export default {
           active: false,
           title: "Edit",
           items: [{
-            command: "cmdResetField",
+            command: "cmdReset",
             title: "reset",
             description: "Reset field to initial state.",
           }, {

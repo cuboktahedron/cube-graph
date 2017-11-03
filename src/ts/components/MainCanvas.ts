@@ -86,7 +86,6 @@ export default {
     this.$store.state.bus.$on('loadData', this.loadData);
     this.$store.state.bus.$on('rotatePaths', this.rotatePaths);
     this.$store.state.bus.$on('saveCanvas', this.save);
-    this.$store.state.bus.$on('cmdNew', this.openNew);
   },
 
   mounted: function () {
