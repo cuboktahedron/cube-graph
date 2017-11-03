@@ -1,12 +1,6 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "lib": [
-      "dom",
-      "es5",
-      "es2015.iterable",
-      "scripthost"
-    ],
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": false,
@@ -14,7 +8,7 @@
     "paths": {
       "ts": [ "./ts/*", "../test/ts/*" ]
     },
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true
   },
   "exclude": [
