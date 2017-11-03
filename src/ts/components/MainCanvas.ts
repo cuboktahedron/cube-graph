@@ -13,7 +13,7 @@ export interface MainCanvas extends Vue {
   width: number,
   nodes: GraphNode[],
   links: GraphLink[],
-  linkIds: string[],　 // TODO: change array to object
+  linkIds: {},
   rotationContext: RotationContext,
   zoom: any,
 
@@ -44,7 +44,7 @@ export default {
     return {
       nodes: [],
       links: [],
-      linkIds: [],
+      linkIds: {},
       rotationContext: new RotationContext(),
       zoom: null,
     }
@@ -387,7 +387,7 @@ export default {
       rootNode.isRoot = true;
       this.nodes = [];
       this.links = [];
-      this.linkIds = [];
+      this.linkIds = {};
       this.rotationContext = new RotationContext();
       this.nodes.push(rootNode);
       this.update();
@@ -400,7 +400,7 @@ export default {
     loadData(data: any): void {
       const newNodes: GraphNode[] = [];
       const newLinks: GraphLink[] = [];
-      const newLinkIds: string[] = [];
+      const newLinkIds = {};
       const oldRootNode = data.nodes.filter(node => node.isRoot)[0];
       const oldIdToNewNode = {};
       const newRootNode = new GraphNode(data.rootStatus);
