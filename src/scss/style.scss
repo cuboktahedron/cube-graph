@@ -43,17 +43,20 @@ body {
   .menu-group,
   .menu-item {
     cursor: pointer;
+    padding: 0 4px;
   }
 
   .menu-group.horizontal {
     display: inline-block;
     margin: 2px;
+    position: relative;
   }
 
   .context-menu {
     background: #404040;
     border: solid 1px grey;
     color: white;
+    left: -1px;
     position: absolute;
     width: 200px;
   }

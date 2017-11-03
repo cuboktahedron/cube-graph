@@ -37,10 +37,6 @@ export default {
             command: "cmdReset",
             title: "reset",
             description: "Reset field to initial state.",
-          }, {
-            command: "cmdDel",
-            title: "del node",
-            description: "Delete selected Node.",
           }]
         },
       ]
