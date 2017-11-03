@@ -145,46 +145,39 @@ export default {
         return;
       }
 
-      let keycodes = {};
-      keycodes['66'] = 'B';
-      keycodes['68'] = 'D';
-      keycodes['69'] = 'E';
-      keycodes['70'] = 'F';
-      keycodes['76'] = 'L';
-      keycodes['77'] = 'M';
-      keycodes['82'] = 'R';
-      keycodes['83'] = 'S';
-      keycodes['85'] = 'U';
-      keycodes['88'] = 'x';
-      keycodes['89'] = 'y';
-      keycodes['90'] = 'z';
-
-      if (event.which in keycodes) {
-        let path = keycodes[event.which] + ((event.shiftKey) ? "'" : "");
+      const rotCode = event.which + ((event.ctrlKey) ? "W" : "") + ((event.shiftKey) ? "R" : "");
+      if (rotCode in RotCodes) {
+        let path = RotCodes[rotCode];
         if (this.rotate(selectedNode, path)) {
           this.update();
         }
+        return;
       }
 
       const selectedLink = this.$store.state.selectedLink;
       if (event.which === 37) { // left arrow
         this.selectLeftLink(selectedNode, selectedLink);
+        return;
       }
 
       if (event.which === 38) { // up arrow
         this.forwardNode(selectedNode, selectedLink);
+        return;
       }
 
       if (event.which === 39) { // right arrow
         this.selectRightLink(selectedNode, selectedLink);
+        return;
       }
 
       if (event.which === 40) { // down arrow
         this.backwardNode(selectedNode, selectedLink);
+        return;
       }
 
       if (event.which === 72) { // H
         this.centering(selectedNode);
+        return;
       }
 
       if (event.which === 46) { // Del
@@ -194,6 +187,7 @@ export default {
           this.$store.dispatch('selectNode', nextNode);
           this.update();
         }
+        return;
       }
     },
 
@@ -496,3 +490,34 @@ export default {
     }
   },
 } as ComponentOptions<MainCanvas>
+
+const RotCodes = (function() {
+  const rotCodesGroup1 = {};
+  rotCodesGroup1['66'] = 'B';
+  rotCodesGroup1['68'] = 'D';
+  rotCodesGroup1['70'] = 'F';
+  rotCodesGroup1['76'] = 'L';
+  rotCodesGroup1['82'] = 'R';
+  rotCodesGroup1['85'] = 'U';
+
+  for (const rotCode in rotCodesGroup1) {
+    rotCodesGroup1[rotCode + 'W'] = rotCodesGroup1[rotCode] + 'w';
+  }
+  for (const rotCode in rotCodesGroup1) {
+    rotCodesGroup1[rotCode + 'R'] = rotCodesGroup1[rotCode] + "'";
+  }
+
+  let rotCodesGroup2 = {};
+  rotCodesGroup2['69'] = 'E';
+  rotCodesGroup2['77'] = 'M';
+  rotCodesGroup2['83'] = 'S';
+  rotCodesGroup2['88'] = 'x';
+  rotCodesGroup2['89'] = 'y';
+  rotCodesGroup2['90'] = 'z';
+
+  for (const rotCode in rotCodesGroup2) {
+    rotCodesGroup2[rotCode + 'R'] = rotCodesGroup2[rotCode] + "'";
+  }
+
+  return Object.assign(rotCodesGroup1, rotCodesGroup2);
+})();
