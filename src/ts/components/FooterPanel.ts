@@ -9,6 +9,6 @@ export default {
   },
 
   template: `
-    <div>Cube Graph v0.1</div>`,
+    <div>Cube Graph v0.2</div>`,
 
 } as ComponentOptions<FooterPanel>
