@@ -1,5 +1,6 @@
 var path = require('path');
 var LicensePack = require('license-pack').default;
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 var configs = {
   entry: ['./src/app.ts'],
@@ -58,6 +59,15 @@ var inDevelopment = process.env.NODE_ENV === "development";
 if (inProduction) {
   configs.plugins.push(new LicensePack({
     glob: '{LICENSE,license,License}*'
+  }));
+
+  configs.plugins.push(new UglifyJSPlugin({
+    uglifyOptions: {
+      beautify: false,
+      ecma: 6,
+      compress: true,
+      comments: false
+    }
   }));
 }
 
