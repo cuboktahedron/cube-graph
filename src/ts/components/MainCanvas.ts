@@ -45,7 +45,7 @@ export default {
       nodes: [],
       links: [],
       linkIds: {},
-      rotationContext: new RotationContext(),
+      rotationContext: null,
       zoom: null,
     }
   },
@@ -382,7 +382,7 @@ export default {
       this.nodes = [];
       this.links = [];
       this.linkIds = {};
-      this.rotationContext = new RotationContext();
+      this.rotationContext = new RotationContext(this.$store.state.config.velocity);
       this.nodes.push(rootNode);
       this.update();
 
@@ -445,7 +445,7 @@ export default {
       this.nodes = newNodes;
       this.links = newLinks;
       this.linkIds = newLinkIds;
-      this.rotationContext = new RotationContext();
+      this.rotationContext = new RotationContext(this.$store.state.config.velocity);
       
       this.update();
 
@@ -487,6 +487,16 @@ export default {
 
     "rotationContext.currentLink": function() {
         this.$store.dispatch("selectActiveLink", this.rotationContext.currentLink);
+    },
+
+    "$store.state.selectedNode" (newValue) {
+      if (newValue && this.$store.state.config.keepsSelectedCenter) {
+        this.centering(newValue);
+      }
+    },
+
+    "$store.state.config.velocity" (newValue) {
+      this.rotationContext.velocity = newValue;
     }
   },
 } as ComponentOptions<MainCanvas>

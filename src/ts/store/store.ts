@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import Configuration from '../models/Configuration';
 import GraphNode from '../models/GraphNode';
 import GraphLink from '../models/GraphLink';
 import * as d3 from 'd3';
@@ -13,6 +14,7 @@ interface State {
   activeLink: GraphLink,
   bus: Vue,
   colors: ScaleOrdinal<string, string>,
+  config: Configuration,
   coordinates: Coordinates,
   debug: boolean,
   nodeNum: number,
@@ -33,6 +35,7 @@ const state: State = {
   activeLink: null,
   bus: new Vue(),
   colors: d3.scaleOrdinal(d3.schemeCategory20),
+  config: new Configuration(),
   coordinates: { x: 0, y: 0 },
   debug: true,
   nodeNum: 0,
@@ -69,8 +72,6 @@ const mutations = {
     if (state.activeLink != null) {
       state.activeLink.isActive = false;
     }
-
-    console.log(activeLink);
 
     state.activeLink = activeLink;
   },

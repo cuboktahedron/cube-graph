@@ -6,6 +6,9 @@ export default class RotationContext {
   _progress = 0
   _positive = true;
   _currentLink: GraphLink = null;
+  _velocity = 10;
+
+  constructor (public velocity: number) {}
 
   addPath(path: string): void {
     this._pendingPaths.push(path);
@@ -30,7 +33,7 @@ export default class RotationContext {
       return;
     }
 
-    this._progress = Math.min(this._progress + 10, 100);
+    this._progress = Math.min(this._progress + this.velocity, 100);
     this._currentLink.progress = this.progress;
     if (this._progress === 100) {
       this._currentLink.isActive = false;
