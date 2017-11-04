@@ -70,6 +70,21 @@ body {
     background: white;
     color: black;
   }
+
+  .menu-item {
+    .icon {
+      display: inline-block;
+      fill: white;
+      position: absolute;
+      right: 4px;
+    }
+  }
+
+  .menu-item:hover {
+    .icon {
+      fill: black;
+    }
+  }
 }
 
 #control-panel {

@@ -20,14 +20,17 @@ export default {
             command: "cmdNew",
             title: "new",
             description: "Open new field.",
+            value: null,
           }, {
             command: "cmdLoad",
             title: "load",
             description: "Load file.",
+            value: null,
           }, {
             command: "cmdSave",
             title: "save",
             description: "Save file.",
+            value: null,
           }]
         },
         {
@@ -37,10 +40,25 @@ export default {
             command: "cmdReset",
             title: "reset",
             description: "Reset field to initial state.",
+            value: null,
+          }]
+        },
+        {
+          active: false,
+          title: "Config",
+          items: [{
+            command: "cmdToggleKeepsSelectedCenter",
+            title: "keep center",
+            description: "selected node is always center or not.",
+            value: null,
           }]
         },
       ]
     };
+  },
+
+  mounted: function() {
+    this.groups[2].items[0].value=this.$store.state.config.keepsSelectedCenter;
   },
 
   template: `
@@ -92,6 +110,15 @@ export default {
       }
 
       this.selectedIndex = index;
+    }
+  },
+
+  watch: {
+    '$store.state.config': {
+      handler: function (val, oldVal) {
+        this.groups[2].items[0].value=this.$store.state.config.keepsSelectedCenter;
+      },
+      deep: true
     }
   }
 } as ComponentOptions<MenuPanel>

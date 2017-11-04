@@ -1,4 +1,4 @@
 export default class Configuration {
-  keepsSelectedCenter = true;
+  keepsSelectedCenter = false;
   velocity = 10;
 }

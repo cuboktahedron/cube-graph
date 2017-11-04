@@ -7,7 +7,7 @@ interface MenuItem extends Vue {
 }
 
 export default {
-  props: ['command', 'title', 'description' ],
+  props: ['command', 'title', 'description', 'value' ],
   data: function () {
     return {
     };
@@ -18,7 +18,9 @@ export default {
       <div class="menu-item"
         :title="description"
         @click.stop="onClick"
-      >{{title}}</div>
+      >{{title}}
+        <icon v-if="value === true" name="check" width="16" />
+      </div>
     </div>`,
 
   methods: {

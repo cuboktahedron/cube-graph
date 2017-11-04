@@ -17,7 +17,8 @@ export default {
       <menu-item class="menu-item" v-for="(item, index) in items" key="index"
         :command="item.command"
         :description="item.description"
-        :title="item.title" />
+        :title="item.title"
+        :value="item.value" />
     </div>`,
 
   methods: {

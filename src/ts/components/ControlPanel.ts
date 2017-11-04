@@ -10,6 +10,7 @@ interface ControllPanel extends Vue {
   openNew(): void,
   save(): void,
   reset(): void,
+  toggleKeepsSelectedCenter(): void,
 }
 
 export default {
@@ -43,6 +44,7 @@ export default {
     this.$store.state.bus.$on('cmdNew', this.openNew);
     this.$store.state.bus.$on('cmdSave', this.save);
     this.$store.state.bus.$on('cmdReset', this.reset);
+    this.$store.state.bus.$on('cmdToggleKeepsSelectedCenter', this.toggleKeepsSelectedCenter)
 
     window.addEventListener('beforeunload', function(e: BeforeUnloadEvent) {
       const dialogText = 'Are you sure you want to leave?';
@@ -115,6 +117,10 @@ export default {
 
     reset: function() {
       this.$store.state.bus.$emit('loadData', this.resetData);
+    },
+
+    toggleKeepsSelectedCenter: function() {
+      this.$store.state.config.keepsSelectedCenter = !this.$store.state.config.keepsSelectedCenter;
     }
   }
 } as ComponentOptions<ControllPanel>
