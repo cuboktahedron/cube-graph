@@ -529,5 +529,9 @@ const RotCodes = (function() {
     rotCodesGroup2[rotCode + 'R'] = rotCodesGroup2[rotCode] + "'";
   }
 
-  return Object.assign(rotCodesGroup1, rotCodesGroup2);
+  for (var attr in rotCodesGroup2) {
+    rotCodesGroup1[attr] = rotCodesGroup2[attr];
+  }
+
+  return rotCodesGroup1;
 })();
