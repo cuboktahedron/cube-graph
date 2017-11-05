@@ -244,13 +244,13 @@ export default class Cube333 {
     }
 
     cubeMoves["Uw"] = cubeMoves["U"].concat(cubeMoves["E'"]);
-    cubeMoves["Dw"] = cubeMoves["E"].concat(cubeMoves["D"]);
+    cubeMoves["Dw"] = cubeMoves["D"].concat(cubeMoves["E"]);
     cubeMoves["Rw"] = cubeMoves["R"].concat(cubeMoves["M'"]);
     cubeMoves["Lw"] = cubeMoves["L"].concat(cubeMoves["M"]);
     cubeMoves["Fw"] = cubeMoves["F"].concat(cubeMoves["S"]);
     cubeMoves["Bw"] = cubeMoves["B"].concat(cubeMoves["S'"]);
     cubeMoves["Uw'"] = cubeMoves["U'"].concat(cubeMoves["E"]);
-    cubeMoves["Dw'"] = cubeMoves["E'"].concat(cubeMoves["D'"]);
+    cubeMoves["Dw'"] = cubeMoves["D'"].concat(cubeMoves["E'"]);
     cubeMoves["Rw'"] = cubeMoves["R'"].concat(cubeMoves["M"]);
     cubeMoves["Lw'"] = cubeMoves["L'"].concat(cubeMoves["M'"]);
     cubeMoves["Fw'"] = cubeMoves["F'"].concat(cubeMoves["S'"]);
