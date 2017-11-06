@@ -16,7 +16,7 @@ interface ControllPanel extends Vue {
 export default {
   data: function () {
     const root = new GraphNode();
-    root.isRoot = true;
+    root.root();
 
     return {
       paths: "",
@@ -88,7 +88,7 @@ export default {
 
     openNew: function() {
       const root = new GraphNode();
-      root.isRoot = true;
+      root.root();
   
       const newData = {
         links: [],

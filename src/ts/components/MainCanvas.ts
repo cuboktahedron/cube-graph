@@ -378,7 +378,7 @@ export default {
 
     openNew: function() {
       const rootNode = new GraphNode();
-      rootNode.isRoot = true;
+      rootNode.root();
       this.nodes = [];
       this.links = [];
       this.linkIds = {};
@@ -398,7 +398,7 @@ export default {
       const oldRootNode = data.nodes.filter(node => node.isRoot)[0];
       const oldIdToNewNode = {};
       const newRootNode = new GraphNode(data.rootStatus);
-      newRootNode.isRoot = true;
+      newRootNode.root();
       oldIdToNewNode[oldRootNode.id] = newRootNode;
       newNodes.push(newRootNode);
       

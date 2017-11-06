@@ -13,9 +13,9 @@ export default class GraphNode {
     GraphNode.initializeRotationPattern();
   }
 
+  private rootNode: GraphNode = null;
   private _id: number;
   private _name: string;
-  isRoot:boolean = false;
 
   get id() {
     return this._id;
@@ -36,7 +36,11 @@ export default class GraphNode {
   set name(newValue: string) {
     this._name = newValue;
   }
-  
+
+  get isRoot(): boolean {
+    return this.rootNode === this;
+  }
+
   private _focused: boolean = false;
 
   get focused() {
@@ -79,6 +83,7 @@ export default class GraphNode {
     newGraphNode.y = this.y;
     newGraphNode.fx = null;
     newGraphNode.fy = null;
+    newGraphNode.rootNode = this.rootNode;
 
     return newGraphNode;
   }
@@ -164,14 +169,22 @@ export default class GraphNode {
       });
       this.updateDistance();
     } else {
-      let targetedLinks = this.links.filter(link => link.target === this);
-      targetedLinks.forEach((link: GraphLink) => {
-        let sourceOfTarget = link.source;
-        if (this.distance < sourceOfTarget.distance) {
+      const targetedLinks = this.links.filter(link => link.target === this);
+      targetedLinks.forEach(link => {
+        const sourceOfTarget = link.source;
+        if (sourceOfTarget.distance === -1 || this.distance < sourceOfTarget.distance) {
           link.source = this;
           link.target = sourceOfTarget;
           link.path += "'";
           link.target.updateLinkDirections();
+        }
+      });
+
+      const sourceLinks = this.links.filter(link => link.source === this);
+      sourceLinks.forEach(link => {
+        const target = link.target;
+        if (target.distance === -1) {
+          target.updateLinkDirections();
         }
       });
     }
@@ -197,6 +210,49 @@ export default class GraphNode {
   pathsToRoot(): string[] {
     const paths = this.pathsFromRoot();
     return paths.map(CubeUtils.reversePath);
+  }
+
+  root(): void {
+    if (this.rootNode === this) {
+      return;
+    }
+
+    this.rootNode = this;
+    this.updateDistance();
+
+    let nodeStack: GraphNode[] = [this];
+    while (nodeStack.length > 0) {
+      const workNodeStack = nodeStack.concat();
+      nodeStack.length = 0;
+      workNodeStack.concat().forEach(node => {
+        const nodesYetReferredOldRoot = node.links.map(link => {
+          if (link.source === node) {
+            return link.target;
+          } else {
+            return link.source;
+          }
+        }).filter(node => node.rootNode !== this);
+        nodesYetReferredOldRoot.forEach(node => {
+          node.rootNode = this
+          node._distance = -1;
+        });
+        nodeStack = nodeStack.concat(nodesYetReferredOldRoot);
+      });
+    }
+
+    this.links.filter(link => link.source === this).forEach(link => {
+      link.target.updateLinkDirections();
+    });
+
+    this.links.filter(link => link.target === this).forEach(link => {
+      const source = link.source;
+      link.source = this;
+      link.target = source;
+      link.path += "'";
+      link.target.updateLinkDirections();
+    });
+
+    // TODO: reconstruct paths
   }
 
   private static RotationTable: object;
