@@ -126,6 +126,18 @@ export default class GraphNode {
     return true;
   }
 
+  get distance(): number {
+    return this._distance;
+  }
+
+  addLink(link: GraphLink): void {
+    this.links.push(link);
+  }
+
+  removeLink(link: GraphLink): void {
+    this.links.splice(this.links.indexOf(link), 1);
+  }
+
   updateDistance(): void {
     if (this.isRoot) {
       this._distance = 0;
@@ -139,18 +151,6 @@ export default class GraphNode {
     } else {
       this._distance = Math.min.apply(null, distances) + 1;
     }
-  }
-
-  get distance(): number {
-    return this._distance;
-  }
-
-  addLink(link: GraphLink): void {
-    this.links.push(link);
-  }
-
-  removeLink(link: GraphLink): void {
-    this.links.splice(this.links.indexOf(link), 1);
   }
 
   updateLinkDirections(): void {
@@ -188,28 +188,6 @@ export default class GraphNode {
         }
       });
     }
-  }
-
-  pathsFromRoot(): string[] {
-    const paths = [];
-
-    this.links.filter((link) => link.source !== this)
-      .forEach((link) => {
-        const sourcePaths = link.source.pathsFromRoot().map((path) => path + link.path);
-        Array.prototype.push.apply(paths, sourcePaths);
-      });
-
-    if (paths[0] === undefined) {
-      // for root node
-      paths.push("");
-    }
-
-    return paths;
-  }
-
-  pathsToRoot(): string[] {
-    const paths = this.pathsFromRoot();
-    return paths.map(CubeUtils.reversePath);
   }
 
   root(): void {
@@ -251,8 +229,28 @@ export default class GraphNode {
       link.path += "'";
       link.target.updateLinkDirections();
     });
+  }
 
-    // TODO: reconstruct paths
+  pathsFromRoot(): string[] {
+    const paths = [];
+
+    this.links.filter((link) => link.source !== this)
+      .forEach((link) => {
+        const sourcePaths = link.source.pathsFromRoot().map((path) => path + link.path);
+        Array.prototype.push.apply(paths, sourcePaths);
+      });
+
+    if (paths[0] === undefined) {
+      // for root node
+      paths.push("");
+    }
+
+    return paths;
+  }
+
+  pathsToRoot(): string[] {
+    const paths = this.pathsFromRoot();
+    return paths.map(CubeUtils.reversePath);
   }
 
   private static RotationTable: object;
