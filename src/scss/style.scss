@@ -23,11 +23,38 @@ body {
   outline: none;
   position: absolute;
   right: 320px;
-  
+}
+
+#main-canvas-panel {
+  height: 100%;
+
   .canvas {
     margin-bottom: -4px;
     height: 100%;
     width: 100%;
+  }
+
+  .node-menu {
+    background: #404040;
+    border: solid 1px grey;
+    color: white;
+    outline: none;
+    position: absolute;
+    width: 200px;
+  }
+
+  > .menu-item + .menu-item {
+    border-left: solid 1px white;
+  }
+
+  .menu-item {
+    padding: 0 4px;
+  }
+
+  .menu-group:hover,
+  .menu-item:hover {
+    background: white;
+    color: black;
   }
 }
 

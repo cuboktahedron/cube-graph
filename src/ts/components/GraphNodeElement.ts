@@ -28,6 +28,7 @@ export default {
       :fill="color"
       v-bind:class="{focused : cube.focused, root: cube.isRoot}"
       @click.stop="onClick" 
+      @contextmenu="onRightClick"
     />`,
 
   mounted: function () {
@@ -47,8 +48,13 @@ export default {
   },
 
   methods: {
-    onClick: function () {
-      this.$store.dispatch('selectNode', this.cube);
+    onClick(e: MouseEvent) {
+     this.$store.dispatch('selectNode', this.cube);
+    },
+
+    onRightClick(e: MouseEvent) {
+      this.$emit("showContextMenu", this.cube, e.x, e.y);
+      e.preventDefault();
     },
 
     dragstarted(d): void {

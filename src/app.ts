@@ -24,6 +24,7 @@ import ContextMenu from './ts/components/ContextMenu'
 import MenuItem from './ts/components/MenuItem'
 import MenuGroup from './ts/components/MenuGroup'
 import MenuPanel from './ts/components/MenuPanel'
+import NodeMenu from './ts/components/NodeMenu'
 
 Vue.component('canvas-panel', MainPanel);
 Vue.component('main-canvas', MainCanvas);
@@ -38,6 +39,7 @@ Vue.component('context-menu', ContextMenu);
 Vue.component('menu-panel', MenuPanel);
 Vue.component('menu-group', MenuGroup);
 Vue.component('menu-item', MenuItem);
+Vue.component('node-menu', NodeMenu);
 Vue.component('cube', CubeView);
 Vue.component('icon', icon);
 

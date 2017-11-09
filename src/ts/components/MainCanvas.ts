@@ -15,6 +15,11 @@ export interface MainCanvas extends Vue {
   links: GraphLink[],
   linkIds: {},
   rotationContext: RotationContext,
+  nodeMenu: {
+    targetNode: GraphNode,
+    top: number,
+    left: number,
+  },
   zoom: any,
 
   centering(node: GraphNode): void,
@@ -31,9 +36,12 @@ export interface MainCanvas extends Vue {
   selectLeftLink(selectedNode: GraphNode, selectedLink: GraphLink),
   selectRightLink(selectedNode: GraphNode, selectedLink: GraphLink),
   selectRoot(),
+  showNodeContextMenu(node: GraphNode, x: number, y: number): void,
+  closeNodeContextMenu(): void,
   mainLoop(): void,
   openNew(): void,
   save(outData: any): void
+  setRootNode(node: GraphNode): void,
   update(): void,
   onZoom(): void,
 }
@@ -46,34 +54,47 @@ export default {
       links: [],
       linkIds: {},
       rotationContext: null,
+      nodeMenu: {
+        targetNode: null,
+      },
       zoom: null,
     }
   },
 
   template: `
-    <svg id="cube-graph-canvas" class="canvas"
-      @click="onClick"
-      @mousemove="onMouseMove">
-      <defs>
-        <marker id="arrow" markerWidth="4" markerHeight="4" refX="15" refY="2"
-            orient="auto" markerUnits="strokeWidth">
-          <path d="M0,0 L0,4 L4,2 z" fill="#f00" fill-opacity="0.6"></path>
-        </marker>
-        <marker id="arrow2" markerWidth="4" markerHeight="4" refX="15" refY="2"
-            orient="auto" markerUnits="strokeWidth">
-          <path d="M0,0 L0,4 L4,2 z" fill="#00f" fill-opacity="0.6"></path>
-        </marker>
-      </defs>
+    <div id="main-canvas-panel">
+      <svg id="cube-graph-canvas" class="canvas"
+        @contextmenu="onContextMenu"
+        @click="onClick"
+        @mousemove="onMouseMove">
+        <defs>
+          <marker id="arrow" markerWidth="4" markerHeight="4" refX="15" refY="2"
+              orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,4 L4,2 z" fill="#f00" fill-opacity="0.6"></path>
+          </marker>
+          <marker id="arrow2" markerWidth="4" markerHeight="4" refX="15" refY="2"
+              orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,4 L4,2 z" fill="#00f" fill-opacity="0.6"></path>
+          </marker>
+        </defs>
 
-      <g :transform="transform">
-        <g class="links">
-          <g-link v-for="link in links" key="link.id" :link="link" />
+        <g :transform="transform">
+          <g class="links">
+            <g-link v-for="link in links" key="link.id" :link="link" />
+          </g>
+          <g class="nodes">
+            <g-node v-for="node in nodes" key="node.id" :cube="node"
+              @showContextMenu="showNodeContextMenu"
+            />
+          </g>
         </g>
-        <g class="nodes">
-          <g-node v-for="node in nodes" key="node.id" :cube="node" />
-        </g>
-      </g>
-    </svg>`,
+      </svg>
+
+      <node-menu class="node-menu" v-if="showsNodeMenu"
+        :targetNode="nodeMenu.targetNode"
+        :style="nodeMenuStyle"
+        @closeMenu="closeNodeContextMenu" />
+    </div>`,
 
   created: function () {
     const simulation = d3.forceSimulation()
@@ -86,6 +107,7 @@ export default {
     this.$store.state.bus.$on('loadData', this.loadData);
     this.$store.state.bus.$on('rotatePaths', this.rotatePaths);
     this.$store.state.bus.$on('saveCanvas', this.save);
+    this.$store.state.bus.$on('setRootNode', this.setRootNode);
   },
 
   mounted: function () {
@@ -111,6 +133,17 @@ export default {
       const transY = this.$store.state.transform.translate.y;
       const scale = this.$store.state.transform.scale;
       return `translate(${transX}, ${transY})scale(${scale})`;
+    },
+
+    showsNodeMenu: function() {
+      return this.nodeMenu.targetNode !== null;
+    },
+
+    nodeMenuStyle: function() {
+      return {
+        top: this.nodeMenu.top + 'px',
+        left: this.nodeMenu.left + 'px',
+      };
     }
   },
 
@@ -126,6 +159,10 @@ export default {
       };
 
       this.$store.dispatch('setTransform', transform);
+    },
+
+    onContextMenu: function(e: Event) {
+      e.preventDefault();
     },
 
     onKeyDown: function (event: KeyboardEvent) {
@@ -473,6 +510,31 @@ export default {
           path: link.path,
         };
       });
+    },
+
+    setRootNode(node: GraphNode): void {
+      node.root();
+    },
+
+    showNodeContextMenu(node: GraphNode, x: number, y: number): void {
+      this.nodeMenu = {
+        targetNode: node,
+        top: y,
+        left: x,
+      };
+
+      Vue.nextTick(function() {
+        const menu = document.getElementsByClassName("node-menu")[0] as HTMLElement;
+        menu.focus();
+      });
+    },
+
+    closeNodeContextMenu(): void {
+      this.nodeMenu = {
+        targetNode: null,
+        top: 0,
+        left: 0,
+      };
     }
   },
 
