@@ -6,11 +6,15 @@ import GraphLink from './GraphLink'
 import * as THREE from 'three'
 
 export default class Cube333 {
-  cubes: Cube[];
+  cubes: Cube[] = [];
+  baseCubes: Cube[] = [];
   rotations: string[] = [];
 
-  constructor() {
-    this.cubes = [];
+  constructor();
+  constructor(paths: string);
+
+  constructor(paths?: string) {
+    paths = paths || "";
 
     for (let x = 0; x < 3; x++) {
       for (let y = 0; y < 3; y++) {
@@ -18,11 +22,14 @@ export default class Cube333 {
           const no = x * 9 + y * 3 + z;
           const cube = new Cube(no);
           cube.pos = new THREE.Vector3(x - 1, y - 1, z - 1);
+          cube.dir = new THREE.Quaternion();
           cube.colors = Cube333.cubeColors[x][y][z];
           this.cubes.push(cube);
         }
       }
     }
+
+    this.rebase()
   }
 
   action(activeLink: GraphLink) {
@@ -56,19 +63,26 @@ export default class Cube333 {
     });
   }
 
-  reset(node: GraphNode) {
-    for (let x = 0; x < 3; x++) {
-      for (let y = 0; y < 3; y++) {
-        for (let z = 0; z < 3; z++) {
-          const no = x * 9 + y * 3 + z;
-          const cube = this.cubes.filter((cube) => cube.no === no)[0];
-          cube.pos = new THREE.Vector3(x - 1, y - 1, z - 1);
-          cube.dir = new THREE.Quaternion();
-        }
-      }
+  rebase(): void {
+    this.baseCubes = [];
+    for (let i = 0; i < this.cubes.length; i++) {
+        const cube = this.cubes[i];
+        const baseCube = new Cube(cube.no);
+        baseCube.pos = cube.pos.clone();
+        baseCube.dir = cube.dir.clone();
+        this.baseCubes.push(baseCube);
     }
+  }
 
-    this.cubes = this.cubes.sort((c1, c2) => (c1.no < c2.no) ? -1 : 1)
+  reset(node: GraphNode) {
+    const cubes: Cube[] = [];
+    this.baseCubes.forEach(baseCube => {
+      const cube = this.cubes.filter((cube) => cube.no === baseCube.no)[0];
+      cube.pos = baseCube.pos.clone();
+      cube.dir = baseCube.dir.clone();
+      cubes.push(cube);
+    });
+    this.cubes = cubes;
 
     const paths = node.pathsFromRoot()[0];
     const pathsArr: string[] = CubeUtils.pathsToArray(paths);

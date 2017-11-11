@@ -9,6 +9,7 @@ interface ControllPanel extends Vue {
   load(): void,
   openNew(): void,
   save(): void,
+  setRootNode(node: GraphNode): void,
   reset(): void,
   toggleKeepsSelectedCenter(): void,
 }
@@ -23,7 +24,6 @@ export default {
       resetData: {
         links: [],
         nodes: [ root ],
-        rootStatus: root.status,
       }        
     };
   },
@@ -45,6 +45,7 @@ export default {
     this.$store.state.bus.$on('cmdSave', this.save);
     this.$store.state.bus.$on('cmdReset', this.reset);
     this.$store.state.bus.$on('cmdToggleKeepsSelectedCenter', this.toggleKeepsSelectedCenter)
+    this.$store.state.bus.$on('setRootNode', this.setRootNode);
 
     window.addEventListener('beforeunload', function(e: BeforeUnloadEvent) {
       const dialogText = 'Are you sure you want to leave?';
@@ -72,7 +73,8 @@ export default {
       reader.onload = (e: any) => {
         try {
           const data = JSON.parse(e.target.result);
-          this.$store.state.bus.$emit('loadData', data);
+          this.$store.state.bus.$emit('loadCanvas', data);
+          this.$store.state.bus.$emit('loadCube', data);
           this.resetData = data;
         } catch (ex) {
           alert('This is not valid file.');
@@ -93,7 +95,6 @@ export default {
       const newData = {
         links: [],
         nodes: [ root ],
-        rootStatus: root.status,
       };
 
       this.resetData = newData;
@@ -103,6 +104,7 @@ export default {
     save: function() {
       const outData = {};
       this.$store.state.bus.$emit('saveCanvas', outData);
+      this.$store.state.bus.$emit('saveCube', outData);
       const text = JSON.stringify(outData);
 
       const blob = new Blob([text]);
@@ -115,8 +117,17 @@ export default {
       document.getElementById('file-save').click();
     },
 
+    setRootNode: function(node: GraphNode): void {
+      this.$store.dispatch('selectNode', node);
+      Vue.nextTick(() => {
+        this.$store.state.bus.$emit('rebaseCube');
+        this.$store.state.bus.$emit('setRootNodeCanvas', node);
+      });
+    },
+
     reset: function() {
-      this.$store.state.bus.$emit('loadData', this.resetData);
+      this.$store.state.bus.$emit('loadCanvas', this.resetData);
+      this.$store.state.bus.$emit('loadCube', this.resetData);
     },
 
     toggleKeepsSelectedCenter: function() {

@@ -104,10 +104,10 @@ export default {
     simulation.force("link")['links'](this.links);
     this.$store.dispatch('setSimulation', simulation);
 
-    this.$store.state.bus.$on('loadData', this.loadData);
+    this.$store.state.bus.$on('loadCanvas', this.loadData);
     this.$store.state.bus.$on('rotatePaths', this.rotatePaths);
     this.$store.state.bus.$on('saveCanvas', this.save);
-    this.$store.state.bus.$on('setRootNode', this.setRootNode);
+    this.$store.state.bus.$on('setRootNodeCanvas', this.setRootNode);
   },
 
   mounted: function () {
@@ -434,7 +434,7 @@ export default {
       const newLinkIds = {};
       const oldRootNode = data.nodes.filter(node => node.isRoot)[0];
       const oldIdToNewNode = {};
-      const newRootNode = new GraphNode(data.rootStatus);
+      const newRootNode = new GraphNode();
       newRootNode.root();
       oldIdToNewNode[oldRootNode.id] = newRootNode;
       newNodes.push(newRootNode);
@@ -492,7 +492,6 @@ export default {
     },
 
     save(outData: any): void {
-      outData.rootStatus = this.nodes.filter(node => node.isRoot)[0].status;
       outData.nodes = this.nodes.map(node => {
         return {
           id: node.id,

@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import 'imports-loader?THREE=three!three/examples/js/controls/OrbitControls';
 
 import Cube333 from '../models/Cube333'
+import Cube from '../models/Cube'
 
 interface CubePanel extends Vue {
   cubes: Cube333,
@@ -16,6 +17,10 @@ interface CubePanel extends Vue {
   action(): void,
   initCube(): void,
   render(): void,
+
+  load(data: any): void,
+  save(data: any): void,
+  rebase(): void,
 }
 
 export default {
@@ -60,6 +65,10 @@ export default {
 
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     this.scene.add(new THREE.AxisHelper(1000));
+
+    this.$store.state.bus.$on('loadCube', this.load);
+    this.$store.state.bus.$on('saveCube', this.save);
+    this.$store.state.bus.$on('rebaseCube', this.rebase);
   },
 
   mounted: function () {
@@ -79,6 +88,40 @@ export default {
     action: function () {
       const activeLink = this.$store.state.activeLink;
       this.cubes.action(activeLink);
+    },
+
+    load: function(data: any): void {
+      const cubes: Cube[] = [];
+      data.baseCubes.forEach(baseCube => {
+        const cube: Cube = this.cubes.cubes.filter(baseCube.No)[0];
+        cube.pos = new THREE.Vector3(baseCube.pos.x, baseCube.pos.y, baseCube.pos.z);
+        cube.dir = new THREE.Quaternion(baseCube.dir.x, baseCube.dir.y, baseCube.dir.z, baseCube.dir.w);
+        cubes.push(cube);
+      });
+      this.cubes.cubes = cubes;
+      this.cubes.rebase();
+    },
+
+    save: function(outData: any): void {
+      outData.baseCubes = this.cubes.baseCubes.map(baseCube => {
+        return {
+          pos: {
+            x: baseCube.pos.x,
+            y: baseCube.pos.y,
+            z: baseCube.pos.z,
+          },
+          dir: {
+            x: baseCube.dir.x,
+            y: baseCube.dir.y,
+            z: baseCube.dir.z,
+            w: baseCube.dir.w,
+          },
+        };
+      });
+    },
+
+    rebase: function(): void {
+      this.cubes.rebase();
     }
   },
 
