@@ -119,8 +119,7 @@ export default {
       .on("zoom", this.onZoom));
 
     setInterval(this.mainLoop, 1000 / 60);
-
-    this.openNew();
+    this.$store.state.bus.$emit('cmdNew');
   },
 
   computed: {

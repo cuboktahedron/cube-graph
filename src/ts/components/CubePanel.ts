@@ -25,9 +25,9 @@ interface CubePanel extends Vue {
 
 export default {
   data: function () {
-  return {
-    cubes: new Cube333()
-  };
+    return {
+      cubes: new Cube333()
+    };
   },
 
   template: `
@@ -93,7 +93,7 @@ export default {
     load: function(data: any): void {
       const cubes: Cube[] = [];
       data.baseCubes.forEach(baseCube => {
-        const cube: Cube = this.cubes.cubes.filter(baseCube.No)[0];
+        const cube: Cube = this.cubes.cubes.filter(cube => cube.no === baseCube.no)[0];
         cube.pos = new THREE.Vector3(baseCube.pos.x, baseCube.pos.y, baseCube.pos.z);
         cube.dir = new THREE.Quaternion(baseCube.dir.x, baseCube.dir.y, baseCube.dir.z, baseCube.dir.w);
         cubes.push(cube);
@@ -105,6 +105,7 @@ export default {
     save: function(outData: any): void {
       outData.baseCubes = this.cubes.baseCubes.map(baseCube => {
         return {
+          no: baseCube.no,
           pos: {
             x: baseCube.pos.x,
             y: baseCube.pos.y,

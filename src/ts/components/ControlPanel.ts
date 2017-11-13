@@ -21,10 +21,7 @@ export default {
 
     return {
       paths: "",
-      resetData: {
-        links: [],
-        nodes: [ root ],
-      }        
+      resetData: null,
     };
   },
 
@@ -95,6 +92,22 @@ export default {
       const newData = {
         links: [],
         nodes: [ root ],
+        baseCubes: (() => {
+          const baseCubes = [];
+          for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+              for (let z = 0; z < 3; z++) {
+                const baseCube = {
+                  no: x * 9 + y * 3 + z,
+                  pos: { x: x - 1, y: y - 1, z: z - 1, },
+                  dir: { x: 0, y: 0, z: 0, w: 1, }
+                };
+                baseCubes.push(baseCube);
+              }
+            }
+          }
+          return baseCubes;
+        })(),
       };
 
       this.resetData = newData;
