@@ -549,13 +549,13 @@ export default {
         this.$store.dispatch("selectActiveLink", this.rotationContext.currentLink);
     },
 
-    "$store.state.selectedNode" (newValue) {
+    "$store.state.selectedNode": function(newValue) {
       if (newValue && this.$store.state.config.keepsSelectedCenter) {
         this.centering(newValue);
       }
     },
 
-    "$store.state.config.velocity" (newValue) {
+    "$store.state.config.velocity": function(newValue) {
       this.rotationContext.velocity = newValue;
     }
   },

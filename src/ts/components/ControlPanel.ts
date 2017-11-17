@@ -3,6 +3,7 @@ import CubeUtils from '../models/CubeUtils'
 import GraphNode from '../models/GraphNode'
 
 interface ControllPanel extends Vue {
+  velocity: number,
   paths: string,
   resetData: any,
 
@@ -20,6 +21,7 @@ export default {
     root.root();
 
     return {
+      velocity: 10,
       paths: "",
       resetData: null,
     };
@@ -32,6 +34,8 @@ export default {
         placeholder="input paths here. (e.g. L'UL'U'L'U'L'ULUL2)"
         @keydown.stop="onKeyDown"
         v-model="paths" />
+      <input type="range" name="rng-velocity" v-model.number="velocity" min="0" max="20" step="1"
+        @change="onChangeVelocity">{{velocity}}
       <input id="file-load" type="file" @change="onLoadFileChange" />
       <a id="file-save" target="_blank" />
     </div>`,
@@ -79,6 +83,10 @@ export default {
       };
       reader.readAsText(files[0]);
       event.target.value = '';
+    },
+
+    onChangeVelocity: function(event) {
+      this.$store.state.config.velocity = this.velocity;
     },
 
     load: function() {
