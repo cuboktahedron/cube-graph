@@ -32,7 +32,7 @@ export default {
       <input id="txt-paths"
         type="text"
         placeholder="input paths here. (e.g. L'UL'U'L'U'L'ULUL2)"
-        @keydown.stop="onKeyDown"
+        @keydown="onKeyDown"
         v-model="paths" />
       <input type="range" name="rng-velocity" v-model.number="velocity" min="0" max="20" step="1"
         @change="onChangeVelocity">{{velocity}}

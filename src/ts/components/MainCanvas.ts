@@ -169,9 +169,6 @@ export default {
         return;
       }
 
-      event.preventDefault();
-      event.stopImmediatePropagation();
-
       let selectedNode: GraphNode = this.$store.state.selectedNode;
       if (this.$store.state.selectedNode == null) {
         if (event.which === 82) { // R
