@@ -64,6 +64,7 @@ export default {
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableKeys = false;
     this.scene.add(new THREE.AxisHelper(1000));
 
     this.$store.state.bus.$on('loadCube', this.load);
