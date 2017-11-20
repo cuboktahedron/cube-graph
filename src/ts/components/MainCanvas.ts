@@ -9,6 +9,7 @@ import GraphLink from '../models/GraphLink'
 import RotationContext from '../models/RotationContext'
 
 export interface MainCanvas extends Vue {
+  isDropping: boolean,
   height: number,
   width: number,
   nodes: GraphNode[],
@@ -28,6 +29,9 @@ export interface MainCanvas extends Vue {
   dragended(d: any): void,
   deleteNode(node: GraphNode):boolean,
   onKeyDown(event: KeyboardEvent): void,
+  onDrop(event: DragEvent): void,
+  onDragLeave(event: DragEvent): void,
+  onDragOver(event: DragEvent): void,
   loadData(data: any);
   rotatePaths(paths: string): void,
   rotate(node: GraphNode, mark: string): boolean,
@@ -50,6 +54,7 @@ export default {
   props: ['height', 'width'],
   data: function () {
     return {
+      isDropping: false,
       nodes: [],
       links: [],
       linkIds: {},
@@ -62,7 +67,12 @@ export default {
   },
 
   template: `
-    <div id="main-canvas-panel">
+    <div id="main-canvas-panel"
+      :class="{ dropover: isDropping }"
+      @dragover.prevent="onDragOver"
+      @dragleave="onDragLeave"
+      @drop.prevent="onDrop">
+
       <svg id="cube-graph-canvas" class="canvas"
         @contextmenu="onContextMenu"
         @click="onClick"
@@ -278,6 +288,20 @@ export default {
 
     onMouseMove: function (e: MouseEvent) {
       this.$store.dispatch("setCoordinates", { x: e.offsetX, y: e.offsetY });
+    },
+
+    onDrop: function (event: DragEvent): void {
+      this.isDropping = false;
+      this.$store.state.bus.$emit('loadFile', event.dataTransfer.files[0]);
+    },
+
+    onDragLeave: function (event: DragEvent): void {
+      this.isDropping = false;
+    },
+
+    onDragOver: function (event: DragEvent): void {
+      this.isDropping = true;
+      event.dataTransfer.dropEffect = 'copy';
     },
 
     rotatePaths: function (paths: string[]) {

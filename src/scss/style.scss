@@ -58,6 +58,11 @@ body {
   }
 }
 
+#main-canvas-panel.dropover {
+  background: pink;
+  content: 'Drop here'
+}
+
 #menu-panel {
   background: #404040;
   border: solid 1px grey;

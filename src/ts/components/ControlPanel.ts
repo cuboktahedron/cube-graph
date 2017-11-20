@@ -8,6 +8,7 @@ interface ControllPanel extends Vue {
   resetData: any,
 
   load(): void,
+  loadFile(file: File): void,
   openNew(): void,
   save(): void,
   setRootNode(node: GraphNode): void,
@@ -46,6 +47,7 @@ export default {
     this.$store.state.bus.$on('cmdSave', this.save);
     this.$store.state.bus.$on('cmdReset', this.reset);
     this.$store.state.bus.$on('cmdToggleKeepsSelectedCenter', this.toggleKeepsSelectedCenter)
+    this.$store.state.bus.$on('loadFile', this.loadFile);
     this.$store.state.bus.$on('setRootNode', this.setRootNode);
 
     window.addEventListener('beforeunload', function(e: BeforeUnloadEvent) {
@@ -66,10 +68,11 @@ export default {
 
     onLoadFileChange: function(event) {
       const files: FileList = event.target.files;
-      if (files.length === 0) {
-        return;
-      }
+      this.loadFile(files[0]);
+      event.target.value = '';
+    },
 
+    loadFile: function(file: File): void {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         try {
@@ -81,8 +84,7 @@ export default {
           alert('This is not valid file.');
         }
       };
-      reader.readAsText(files[0]);
-      event.target.value = '';
+      reader.readAsText(file);
     },
 
     onChangeVelocity: function(event) {
