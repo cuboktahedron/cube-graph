@@ -254,3 +254,8 @@ body {
 .icon {
   fill: #000;
 }
+
+input[type="text"].error {
+  border-color: red;
+  background: pink;
+}

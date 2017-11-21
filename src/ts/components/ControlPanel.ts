@@ -14,6 +14,9 @@ interface ControllPanel extends Vue {
   setRootNode(node: GraphNode): void,
   reset(): void,
   toggleKeepsSelectedCenter(): void,
+
+  isValid(): boolean
+  validation(): object,
 }
 
 export default {
@@ -34,7 +37,8 @@ export default {
         type="text"
         placeholder="input paths here. (e.g. L'UL'U'L'U'L'ULUL2)"
         @keydown="onKeyDown"
-        v-model="paths" />
+        v-model="paths"
+        :class="{ error: !validation.paths }" />
       <input type="range" name="rng-velocity" v-model.number="velocity" min="0" max="20" step="1"
         @change="onChangeVelocity">{{velocity}}
       <input id="file-load" type="file" @change="onLoadFileChange" />
@@ -57,12 +61,31 @@ export default {
     });
   },
 
+  computed: {
+    validation: function (): object {
+      const r = /^((([UDRLFB]w?'*)|([EMSxyz]'*))([0-9]*))*$/;
+      return {
+        paths: r.test(this.paths),
+      }
+    },
+
+    isValid: function (): boolean {
+      const validation = this.validation
+      return Object.keys(validation).every(function (key) {
+        console.log(validation[key])
+        return validation[key]
+      })
+    }
+  },
+
   methods: {
     onKeyDown: function (event: KeyboardEvent) {
       if (event.which == 13) { // Enter
-        const pathsArr: string[] = CubeUtils.pathsToArray(this.paths);
-        this.$store.state.bus.$emit('rotatePaths', pathsArr);
-        this.paths = "";
+        if (this.isValid) {
+          const pathsArr: string[] = CubeUtils.pathsToArray(this.paths);
+          this.$store.state.bus.$emit('rotatePaths', pathsArr);
+          this.paths = "";
+        }
       }
     },
 
